@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   checklistContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 24,
+    marginBottom: 20,
   },
   checklistColumn: {
     flex: 1,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   checklistItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   checklistIcon: {
     marginRight: 8,
@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
   checklistText: {
     fontSize: 12,
     fontWeight: "500",
+    lineHeight: 14,
     flex: 1,
   },
   takeActionButton: {
