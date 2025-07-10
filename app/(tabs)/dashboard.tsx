@@ -5,6 +5,8 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { Ionicons } from "@expo/vector-icons";
 import { Svg, Circle } from "react-native-svg";
+import { navigate } from "expo-router/build/global-state/routing";
+import { Link } from "expo-router";
 
 interface StatItemProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -216,7 +218,7 @@ export default function DashboardScreen() {
         <View style={styles.actionsContainer}>
           <ActionButton
             title="Manage Reviews"
-            onPress={() => console.log("Manage Reviews")}
+            onPress={() => navigate("/reviews")}
           />
           <ActionButton
             title="Schedule Posts"
