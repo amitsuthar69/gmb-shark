@@ -8,7 +8,11 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
-import { ThemeProvider as CustomThemeProvider, useThemeContext } from "@/contexts/ThemeContext";
+import {
+  ThemeProvider as CustomThemeProvider,
+  useThemeContext,
+} from "@/contexts/ThemeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 function AppContent() {
   const { theme } = useThemeContext();
@@ -36,7 +40,9 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <CustomThemeProvider>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </CustomThemeProvider>
   );
 }

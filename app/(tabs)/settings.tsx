@@ -4,7 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useThemeContext } from "@/contexts/ThemeContext"; // Import the context hook
+import { useThemeContext } from "@/contexts/ThemeContext";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 const SettingButton = ({
   icon,
@@ -45,7 +47,8 @@ const SettingButton = ({
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
-  const { theme, toggleTheme } = useThemeContext(); // Get theme and toggleTheme from context
+  const { theme, toggleTheme } = useThemeContext();
+  const { signOut } = useContext(AuthContext);
 
   const borderColor = useThemeColor(
     { light: "#e5e7eb", dark: "#3a3a3c" },
@@ -58,7 +61,16 @@ export default function SettingsScreen() {
   const textColor = useThemeColor({}, "text");
 
   const handleToggleTheme = () => {
-    toggleTheme(); // This will now properly toggle the theme
+    toggleTheme();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      console.log("Successfully signed out");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (
@@ -84,7 +96,7 @@ export default function SettingsScreen() {
 
       <TouchableOpacity
         style={[styles.logoutButton, { backgroundColor: bgColor, borderColor }]}
-        onPress={() => console.log("Logging out...")}
+        onPress={handleLogout}
       >
         <Ionicons
           name="log-out-outline"
