@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { ThemedTextInput } from "@/components/ui/ThemedTextInput";
 import { Ionicons } from "@expo/vector-icons";
+import { AuthContext } from "@/contexts/AuthContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -37,12 +38,16 @@ export default function AuthScreen() {
     "text"
   );
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
+  const { signIn, userToken } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (userToken) {
+      navigate("/(tabs)/dashboard");
     }
-    Alert.alert("Login", `Logging in with ${email}`);
+  });
+
+  const handleLogin = async () => {
+    await signIn("token");
     navigate("/(tabs)/dashboard");
   };
 

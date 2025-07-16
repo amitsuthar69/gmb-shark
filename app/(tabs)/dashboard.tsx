@@ -6,7 +6,8 @@ import { ThemedView } from "@/components/ui/ThemedView";
 import { Ionicons } from "@expo/vector-icons";
 import { Svg, Circle } from "react-native-svg";
 import { navigate } from "expo-router/build/global-state/routing";
-import { Link } from "expo-router";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 interface StatItemProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -135,6 +136,11 @@ export default function DashboardScreen() {
     { light: "#8e8e93", dark: "#8e8e93" },
     "text"
   );
+
+  const { userToken } = useContext(AuthContext);
+  useEffect(() => {
+    if (!userToken) navigate("/");
+  });
 
   const checklistItems = [
     { text: "Professional photos", isGood: true },

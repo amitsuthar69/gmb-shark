@@ -4,6 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 
 const SettingButton = ({
   icon,
@@ -14,8 +17,14 @@ const SettingButton = ({
   label: string;
   onPress: () => void;
 }) => {
-  const bgColor = useThemeColor({ light: "#fff", dark: "#1c1c1e" }, "background");
-  const borderColor = useThemeColor({ light: "#e5e7eb", dark: "#3a3a3c" }, "background");
+  const bgColor = useThemeColor(
+    { light: "#fff", dark: "#1c1c1e" },
+    "background"
+  );
+  const borderColor = useThemeColor(
+    { light: "#e5e7eb", dark: "#3a3a3c" },
+    "background"
+  );
   const textColor = useThemeColor({}, "text");
 
   return (
@@ -23,7 +32,12 @@ const SettingButton = ({
       style={[styles.settingButton, { backgroundColor: bgColor, borderColor }]}
       onPress={onPress}
     >
-      <Ionicons name={icon} size={20} color={textColor} style={styles.settingIcon} />
+      <Ionicons
+        name={icon}
+        size={20}
+        color={textColor}
+        style={styles.settingIcon}
+      />
       <ThemedText style={[styles.settingLabel, { color: textColor }]}>
         {label}
       </ThemedText>
@@ -33,25 +47,66 @@ const SettingButton = ({
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
-  const borderColor = useThemeColor({ light: "#e5e7eb", dark: "#3a3a3c" }, "background");
-  const bgColor = useThemeColor({ light: "#fff", dark: "#1c1c1e" }, "background");
+  const { theme, toggleTheme } = useThemeContext();
+  const { signOut } = useContext(AuthContext);
+
+  const borderColor = useThemeColor(
+    { light: "#e5e7eb", dark: "#3a3a3c" },
+    "background"
+  );
+  const bgColor = useThemeColor(
+    { light: "#fff", dark: "#1c1c1e" },
+    "background"
+  );
   const textColor = useThemeColor({}, "text");
+
+  const handleToggleTheme = () => {
+    toggleTheme();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      console.log("Successfully signed out");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <ThemedView style={styles.container}>
       <View style={styles.buttonGroup}>
         <SettingButton icon="person" label="GMB Profile" onPress={() => {}} />
-        <SettingButton icon="moon" label="Theme" onPress={() => {}} />
-        <SettingButton icon="list" label="Manage Subscription" onPress={() => {}} />
-        <SettingButton icon="construct" label="Manage Permissions" onPress={() => {}} />
+        <SettingButton
+          icon={theme === "dark" ? "sunny" : "moon"} // Dynamic icon based on current theme
+          label={`Theme (${theme === "dark" ? "Dark" : "Light"})`} // Show current theme
+          onPress={handleToggleTheme}
+        />
+        <SettingButton
+          icon="list"
+          label="Manage Subscription"
+          onPress={() => {}}
+        />
+        <SettingButton
+          icon="construct"
+          label="Manage Permissions"
+          onPress={() => {}}
+        />
       </View>
 
       <TouchableOpacity
         style={[styles.logoutButton, { backgroundColor: bgColor, borderColor }]}
-        onPress={() => console.log("Logging out...")}
+        onPress={handleLogout}
       >
-        <Ionicons name="log-out-outline" size={20} color={textColor} style={styles.settingIcon} />
-        <ThemedText style={[styles.logoutText, { color: textColor }]}>Log Out</ThemedText>
+        <Ionicons
+          name="log-out-outline"
+          size={20}
+          color={textColor}
+          style={styles.settingIcon}
+        />
+        <ThemedText style={[styles.logoutText, { color: textColor }]}>
+          Log Out
+        </ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );
@@ -60,8 +115,8 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-		paddingTop: 48,
-		padding: 16,
+    paddingTop: 48,
+    padding: 16,
   },
   buttonGroup: {
     flexGrow: 1,
