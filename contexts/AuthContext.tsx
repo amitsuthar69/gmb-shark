@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         dispatch({ type: "SIGN_OUT" });
       },
     }),
-    [state.userToken, state.isLoading]
+    [state.userToken, state.isLoading],
   );
 
   if (state.isLoading) return null;

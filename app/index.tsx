@@ -6,16 +6,21 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
+import { navigate } from "expo-router/build/global-state/routing";
 import { LinearGradient } from "expo-linear-gradient";
 import * as WebBrowser from "expo-web-browser";
-import { navigate } from "expo-router/build/global-state/routing";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { ThemedTextInput } from "@/components/ui/ThemedTextInput";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "@/contexts/AuthContext";
+import * as Google from "expo-auth-session/providers/google";
+import { googleAndroidClientId, googleWebClientId } from "@/firebase/config";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { auth } from "@/firebase/config";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -30,12 +35,12 @@ export default function AuthScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const cardColor = useThemeColor(
     { light: "#ffffff", dark: "#1c1c1e" },
-    "background"
+    "background",
   );
   const textColor = useThemeColor({}, "text");
   const mutedColor = useThemeColor(
     { light: "#8e8e93", dark: "#8e8e93" },
-    "text"
+    "text",
   );
 
   const { signIn, userToken } = useContext(AuthContext);
@@ -44,12 +49,42 @@ export default function AuthScreen() {
     if (userToken) {
       navigate("/(tabs)/dashboard");
     }
-  });
+  }, [userToken]);
 
   const handleLogin = async () => {
     await signIn("token");
     navigate("/(tabs)/dashboard");
   };
+
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: googleAndroidClientId,
+    webClientId: googleWebClientId,
+    scopes: ["email"],
+  });
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+
+      if (!id_token) {
+        console.error("No ID token returned from Google");
+        return;
+      }
+
+      const credential = GoogleAuthProvider.credential(id_token);
+
+      signInWithCredential(auth, credential)
+        .then(async (userCredential) => {
+          const user = userCredential.user;
+          const token = await user.getIdToken();
+          await signIn(token);
+          navigate("/(tabs)/dashboard");
+        })
+        .catch((error) => {
+          Alert.alert("Login Failed", error.message);
+        });
+    }
+  }, [response]);
 
   return (
     <ThemedView style={styles.container}>
@@ -159,6 +194,7 @@ export default function AuthScreen() {
               styles.socialButton,
               { backgroundColor, borderColor: mutedColor },
             ]}
+            onPress={() => promptAsync()}
           >
             <View style={styles.socialButtonContent}>
               <View style={styles.googleIconContainer}>
