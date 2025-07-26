@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
-  ActivityIndicator,
 } from "react-native";
 import { navigate } from "expo-router/build/global-state/routing";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,6 +20,7 @@ import * as Google from "expo-auth-session/providers/google";
 import { googleAndroidClientId, googleWebClientId } from "@/firebase/config";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "@/firebase/config";
+import { createUserIfNotExists } from "@/firebase/db/users";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -77,7 +77,16 @@ export default function AuthScreen() {
         .then(async (userCredential) => {
           const user = userCredential.user;
           const token = await user.getIdToken();
+
+          // add user to db
+          await createUserIfNotExists({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          });
+
           await signIn(token);
+
           navigate("/(tabs)/dashboard");
         })
         .catch((error) => {
